@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Calculator</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            background: linear-gradient(45deg, rgb(143, 244, 255), white, red);
+            width: 100dvw;
+            height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .longInput {
+            /* width: 50%; */
+            outline: none !important;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bolder;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            width: 100%;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .result p {
+            margin: 5px 0;
+        }
+
+        h1,
+        h3 {
+            text-align: center;
+        }
+
+        .addSharePrice:focus,
+        .addShare:focus {
+            outline: none !important;
+            text-align: center;
+        }
+
+
+        .sharesPriceLtp {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* width: 50%; */
+        }
+
+        .sharesPriceLtp label {
+            width: 35%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Investment Calculator</h1>
+        <form id="calcForm">
+            <div class="sharesPriceLtp">
+                <label for="total_shares">Total Shares:</label>
+                <input type="number" step="any" id="total_shares" name="total_shares" class="longInput" required>
+
+            </div>
+
+            <div class="sharesPriceLtp">
+                <label for="average_price">Average Price:</label>
+                <input type="number" step="any" id="average_price" name="average_price" class="longInput" required>
+
+            </div>
+
+            <div class="sharesPriceLtp">
+
+                <label for="current_ltp">Current LTP:</label>
+                <input type="number" step="any" id="current_ltp" name="current_ltp" class="longInput" required>
+            </div>
+
+            <h3>Add New Shares and Prices:</h3>
+            {% for i in range(1, 6) %}
+            <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+                <label for="set_{{ i }}_shares" style="flex: 1;">Set {{ i }} - Share:</label>
+                <input type="number" step="any" id="set_{{ i }}_shares" name="set_{{ i }}_shares" style="flex: 1;"
+                    class="addShare">
+
+                <label for="set_{{ i }}_price" style="flex: 1;">Set {{ i }} - Price:</label>
+                <input type="number" step="any" id="set_{{ i }}_price" name="set_{{ i }}_price" style="flex: 1;"
+                    class="addSharePrice">
+            </div>
+            {% endfor %}
+            <!-- Repeat for other sets as needed -->
+
+            <button type="submit" id="submit">Calculate</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('calcForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+
+            const response = await fetch('/calculate', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+            } else {
+                resultDiv.innerHTML = `
+                    <p>Total Investment: ₹${data.total_investment}</p>
+                    <p>Profit/Loss: ₹${data.profit_or_loss}</p>
+                    <p>Percentage: ${data.percentage}%</p>
+                    <h3>New Average Prices:</h3>
+                    <ul>${data.new_averages.map(avg => `<li>${avg}</li>`).join('')}</ul>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>
