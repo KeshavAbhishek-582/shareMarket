@@ -153,9 +153,9 @@
                 resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
             } else {
                 resultDiv.innerHTML = `
-                    <p>Total Investment: ₹${data.total_investment}</p>
-                    <p>Profit/Loss: ₹${data.profit_or_loss}</p>
-                    <p>Percentage: ${data.percentage}%</p>
+                    <p>${data.total_investment}</p>
+                    <p>${data.profit_or_loss}</p>
+                    <p>${data.percentage}</p>
                     <h3>New Average Prices:</h3>
                     <ul>${data.new_averages.map(avg => `<li>${avg}</li>`).join('')}</ul>
                 `;
